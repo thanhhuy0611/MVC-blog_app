@@ -1,5 +1,10 @@
 {% for post in posts %}
-<h1>{{post.title}}</h1>
-<p>{{post.body}}</p>
-<small>{{post.author}}</small>
+<div class='box'>
+    <h1>{{post.title}}</h1>
+    <p>{{post.body}}</p>
+    <small>{{post.author}}</small>
+    <form method="POST" action={{url_for("delete_blog",b=post.id)}}>
+        <button type="submit">Delete</button>
+    </form>
+</div>
 {% endfor %}
