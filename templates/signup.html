@@ -13,6 +13,14 @@
   {% endif %}
 {% endwith %}
 <form method="POST">
+    {{form.hidden_tag()}}
+    {{form.username.label}} : {{form.username}}
+    {{form.email.label}} : {{form.email}}
+    {{form.password.label}} : {{form.password}}
+    {{form.confirm.label}} : {{form.confirm}}
+    {{form.submit}}
+
+<!-- 
     <div class="form-group">
         <label for="exampleInputEmail1">Email address</label>
         <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
@@ -33,7 +41,7 @@
         <input type="checkbox" class="form-check-input" id="exampleCheck1">
         <label class="form-check-label" for="exampleCheck1">Check me out</label>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary">Submit</button> -->
 </form>
 
 {% endblock %}
