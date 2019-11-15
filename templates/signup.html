@@ -2,46 +2,60 @@
 
 {% block content %}
 {% with messages = get_flashed_messages(with_categories=true) %}
-  <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }} alert-dismissible" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <!-- <strong>Title</strong> --> {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
+<!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+    <!-- <strong>Title</strong> --> {{ message }}
+</div>
+{% endfor %}
+{% endif %}
 {% endwith %}
-<form method="POST">
-    {{form.hidden_tag()}}
-    {{form.username.label}} : {{form.username}}
-    {{form.email.label}} : {{form.email}}
-    {{form.password.label}} : {{form.password}}
-    {{form.confirm.label}} : {{form.confirm}}
-    {{form.submit}}
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-3"></div>
+        <div class="col-6">
+            <form method="POST">
+                {{form.hidden_tag()}}
+                <!-- {{form.username.label}} : {{form.username}}
+                {{form.email.label}} : {{form.email}}
+                {{form.password.label}} : {{form.password}}
+                {{form.confirm.label}} : {{form.confirm}}
+                {{form.submit}} -->
 
-<!-- 
-    <div class="form-group">
-        <label for="exampleInputEmail1">Email address</label>
-        <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-            placeholder="Enter email">
-        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-    </div>
-    <div class="form-group">
-        <label for="exampleInputPassword1">Password</label>
-        <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-    </div>
-    <div class="form-group">
-        <label for="exampleInputEmail1">User name</label>
-        <input name="user_name" type="user_name" class="form-control" id="exampleInputname" aria-describedby="emailHelp"
-            placeholder="Enter name">
-        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-    </div>
-    <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="exampleCheck1">
-        <label class="form-check-label" for="exampleCheck1">Check me out</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button> -->
-</form>
 
+                <div class="form-group">
+                    <!-- <label for="exampleInputEmail1">Email address</label>
+                    <input name="email" type="email" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp" placeholder="Enter email"> -->
+                    {{form.email.label}} : {{form.email(class_="form-control")}}
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone
+                        else.</small>
+                </div>
+                <div class="form-group">
+                    <!-- <label for="exampleInputPassword1">Password</label>
+                    <input name="password" type="password" class="form-control" id="exampleInputPassword1"
+                        placeholder="Password"> -->
+                    {{form.password.label}} : {{form.password(class_="form-control")}}
+                </div>
+                <div class="form-group">
+                    {{form.confirm.label}} : {{form.confirm(class_="form-control")}}
+                </div>
+                <div class="form-group">
+                    <!-- <label for="exampleInputEmail1">User name</label>
+                    <input name="user_name" type="user_name" class="form-control" id="exampleInputname"
+                        aria-describedby="emailHelp" placeholder="Enter name"> -->
+                    {{form.username.label}} : {{form.username(class_="form-control")}}
+
+                </div>
+                <div class="text-center mt-2">
+                    <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+                    {{form.submit(class_="btn btn-primary")}}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,0 +1,23 @@
+{% extends './base.html' %}
+
+{% block content %}
+<div class="container">
+    <form method="POST" action="{{url_for('edit_post',id = post.id)}}">
+        <label for="basic-url">What do you want to share?</label>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon3">Title</span>
+            </div>
+            <input name="title" value="{{post.title}}" type="text" class="form-control" id="basic-url"
+                aria-describedby="basic-addon3">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Content</span>
+            </div>
+            <textarea name="body" class="form-control" aria-label="With textarea">{{post.body}}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mb-3">Post</button>
+    </form>
+</div>
+{% endblock %}

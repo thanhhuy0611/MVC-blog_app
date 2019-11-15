@@ -28,6 +28,7 @@ class Blog(db.Model):
     author = db.Column(db.String,nullable = False)
     created_on = db.Column(db.DateTime, server_default=db.func.now())
     updated_on = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
+    user_id = db.Column(db.String,nullable = False)
 class Users(UserMixin,db.Model):
     id = db.Column(db.Integer, primary_key = True) 
     email = db.Column(db.String,nullable= False,unique = True)
@@ -42,6 +43,14 @@ class Users(UserMixin,db.Model):
     def check_password(self, password):
         return check_password_hash(self.password,password)
 
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    body =  db.Column(db.String,nullable= False)  
+    user_id = db.Column(db.String,nullable = False)
+    blog_id = db.Column(db.String,nullable = False)
+    created_on = db.Column(db.DateTime, server_default=db.func.now())
+    updated_on = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
+
 db.create_all()
 
 # # My awesome forms
@@ -54,7 +63,7 @@ class RegisterForm(FlaskForm):
     email = StringField(
         "Email", validators=[
             validators.DataRequired(), 
-            validators.Length(min=3,max=20,message="Need to be in between 3 and 20"), 
+            validators.Length(min=3,max=200,message="Need to be in between 3 and 20"), 
             validators.Email("Please enter correct email!")
     ])
     password = PasswordField(
@@ -69,7 +78,7 @@ class RegisterForm(FlaskForm):
 def sign_up():
     form = RegisterForm()
     if not current_user.is_anonymous:
-        return redirect(url_for('new_post'))
+        return redirect(url_for('home'))
     if request.method == "POST":
         if form.validate_on_submit():
         #check email unique
@@ -86,30 +95,81 @@ def sign_up():
                 db.session.add(new_user)
                 db.session.commit()
                 login_user(new_user)
-                return redirect(url_for('new_post'))
+                return redirect(url_for('home'))
         print(form.errors.items())
     return render_template('/signup.html', form = form)
 
 # set current_user
 @login_manager.user_loader
 def load_user(b):
-    return Users.query.filter_by(id = b).all()[0]
+    return Users.query.filter_by(id = b).first()
 
-# add new blog
+# comment
+@app.route('/posts/<id>/comments', methods=['GET','POST'])
+def create_comment(id):
+    ref = request.args.get('ref')
+    print(ref)
+    if request.method == "POST":
+        comment = Comment(
+            body = request.form["body"],
+            user_id = current_user.id,
+            blog_id = id
+        )
+    db.session.add(comment)
+    db.session.commit()
+    return redirect(url_for(ref, id= id))
+
+# delete comment
+@app.route('/posts/<id>/comments/<id_comment>', methods=['GET','POST'])
+def delete_comment(id,id_comment):
+    ref = request.args.get('ref')
+    print('ref',ref)
+    comment = Comment.query.filter_by(id = id_comment).first()
+    db.session.delete(comment)
+    db.session.commit()
+    return redirect(url_for(ref, id= id))
+
+# show all blog
 @app.route('/',methods=["GET","POST"])
+def home():
+    posts = Blog.query.all()
+    for post in posts:
+        post.comments = Comment.query.filter_by(blog_id = post.id).all()
+    if request.args.get('filter') == 'most-recently':
+        posts = Blog.query.order_by(Blog.created_on.desc()).all()
+    return render_template('/index.html',posts = posts, ref = 'home')
+    
+# add new blog
+@app.route('/newpost',methods=["GET","POST"])
 def new_post():
     if request.method == "POST":
         new_blog =  Blog(
             title = request.form["title"],
             body = request.form["body"],
-            author = request.form["author"]
+            author = current_user.user_name,
+            user_id = current_user.id
         )
         db.session.add(new_blog)
         db.session.commit()
-        return redirect(url_for('new_post'))
-    # show all blog
-    posts = Blog.query.all()
-    return render_template('/index.html',posts = posts )
+        return redirect(url_for('home'))
+
+#view a blog
+@app.route('/posts/<id>',methods=["GET","POST"])
+def view_post(id):
+    post = Blog.query.get(id)
+    post.comments = Comment.query.filter_by(blog_id = id).all()
+    return render_template('/post.html',post = post, ref = 'view_post')
+
+#Edit a blog
+@app.route('/posts/<id>/edit',methods=['GET','POST'])
+def edit_post(id):
+    post = Blog.query.get(id)
+    if request.method == "POST":
+        post.title = request.form['title']
+        post.body = request.form['body']
+        db.session.commit()
+        return redirect(url_for('view_post',id = id))
+    return render_template('/editpost.html',post = post)
 
 # delete a blog
 @app.route('/blog/<b>', methods=["GET","POST","DELETE"])
@@ -121,13 +181,13 @@ def delete_blog(b):
             return "there is no such post"
         db.session.delete(post)
         db.session.commit()
-        return redirect(url_for('new_post'))
+        return redirect(url_for('home'))
 
 # check account login
 @app.route('/login', methods=["GET","POST"])
 def login():
     if not current_user.is_anonymous:
-        return redirect(url_for('new_post'))
+        return redirect(url_for('home'))
 
     if request.method == "POST":
         user = Users.query.filter_by(email = request.form["email"]).first()
@@ -136,7 +196,7 @@ def login():
         if user:
             if user.check_password(request.form['password']):
                 login_user(user)
-                return redirect(url_for('new_post'))
+                return redirect(url_for('home'))
             else:
                 flash('Password incorrect!','danger')
     return render_template('/login.html')
@@ -147,7 +207,6 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login'))
-
 
 
 if __name__ == "__main__":

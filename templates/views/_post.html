@@ -1,0 +1,31 @@
+<div class='box'>
+    <small>{{post.created_on}}</small>
+    <h1><a href="{{url_for('view_post', id= post.id)}}">{{post.title}}</a></h1>
+    <textarea disabled>{{post.body}}</textarea>
+    <small>Created by: {{post.author}}</small>
+
+    <form action="{{url_for('delete_blog',b=post.id)}}">
+        <button type="submit">Delete</button>
+    </form>
+
+    <form  action="{{url_for('edit_post',id=post.id)}}">
+        <button type="submit">Edit</button>
+    </form>
+
+    {% for comment in post.comments %}
+    <p>
+        <a href="/">{{current_user.user_name}} </a> 
+        {{ comment.body }} <small> - at {{comment.created_on}}</small>
+        <a href="{{url_for('delete_comment',id = post.id, id_comment = comment.id, ref =ref)}}">X</a>
+    </p>
+    
+    {% endfor %}
+
+    <form class="input-group mb-3" method="POST" action="{{url_for('create_comment', id = post.id, ref=ref)}}">
+        <input name="body" type="text" class="form-control" placeholder="Comment here" aria-label="Recipient's username"
+            aria-describedby="button-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Comment</button>
+        </div>
+    </form>
+</div>
