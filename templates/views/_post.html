@@ -3,6 +3,7 @@
     <h1><a href="{{url_for('view_post', id= post.id)}}">{{post.title}}</a></h1>
     <textarea disabled>{{post.body}}</textarea>
     <small>Created by: {{post.author}}</small>
+    <small> Views: {{post.view_count}} </small>
 
     <form action="{{url_for('delete_blog',b=post.id)}}">
         <button type="submit">Delete</button>

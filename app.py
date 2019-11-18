@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, current_user, login_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_wtf import FlaskForm
+from flask_migrate import Migrate
 from wtforms import StringField, validators, PasswordField, SubmitField
 
 
@@ -13,6 +14,9 @@ app.config['SECRET_KEY'] = "KHOA OC-CHO"
 
 #config SQLAlchemy
 db = SQLAlchemy(app)
+
+#set up Flask
+migrate = Migrate(app, db)
 
 # set up flask-login
 login_manager = LoginManager(app)
@@ -29,6 +33,8 @@ class Blog(db.Model):
     created_on = db.Column(db.DateTime, server_default=db.func.now())
     updated_on = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
     user_id = db.Column(db.String,nullable = False)
+    view_count = db.Column(db.Integer, default=0)
+
 class Users(UserMixin,db.Model):
     id = db.Column(db.Integer, primary_key = True) 
     email = db.Column(db.String,nullable= False,unique = True)
@@ -53,7 +59,7 @@ class Comment(db.Model):
 
 db.create_all()
 
-# # My awesome forms
+## My awesome forms
 class RegisterForm(FlaskForm):
     username = StringField(
         "User name", validators=[
@@ -73,6 +79,7 @@ class RegisterForm(FlaskForm):
     ])
     confirm = PasswordField('Confirm password', validators=[validators.DataRequired()])
     submit = SubmitField('Sign up')
+
 # sign up account
 @app.route('/signup', methods=["GET","POST"])
 def sign_up():
@@ -157,6 +164,8 @@ def new_post():
 @app.route('/posts/<id>',methods=["GET","POST"])
 def view_post(id):
     post = Blog.query.get(id)
+    post.view_count +=1
+    db.session.commit() 
     post.comments = Comment.query.filter_by(blog_id = id).all()
     return render_template('/post.html',post = post, ref = 'view_post')
 
