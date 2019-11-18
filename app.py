@@ -140,12 +140,18 @@ def delete_comment(id,id_comment):
 @app.route('/',methods=["GET","POST"])
 def home():
     posts = Blog.query.all()
+    filter = request.args.get('filter')
     for post in posts:
         post.comments = Comment.query.filter_by(blog_id = post.id).all()
-    if request.args.get('filter') == 'most-recently':
+    if filter == 'most-recently':
         posts = Blog.query.order_by(Blog.created_on.desc()).all()
+    if filter == 'top-viewed':
+        posts = Blog.query.order_by(Blog.view_count.desc()).all()
     return render_template('/index.html',posts = posts, ref = 'home')
-    
+
+
+
+
 # add new blog
 @app.route('/newpost',methods=["GET","POST"])
 def new_post():
