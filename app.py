@@ -5,12 +5,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_wtf import FlaskForm
 from flask_migrate import Migrate
 from wtforms import StringField, validators, PasswordField, SubmitField
-
+import os 
 
 #setup and config Flask app
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
-app.config['SECRET_KEY'] = "KHOA OC-CHO"
+print(os.environ.get('DATABASE_URL'))
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or os.environ.get('DATABASE_POSTGRES')
+app.config['SECRET_KEY'] = "anything"
 
 #config SQLAlchemy
 db = SQLAlchemy(app)
@@ -35,6 +36,7 @@ class Blog(db.Model):
     user_id = db.Column(db.String,nullable = False)
     view_count = db.Column(db.Integer, default=0)
 
+
 class Users(UserMixin,db.Model):
     id = db.Column(db.Integer, primary_key = True) 
     email = db.Column(db.String,nullable= False,unique = True)
@@ -52,10 +54,11 @@ class Users(UserMixin,db.Model):
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     body =  db.Column(db.String,nullable= False)  
-    user_id = db.Column(db.String,nullable = False)
-    blog_id = db.Column(db.String,nullable = False)
+    user_id = db.Column(db.Integer,nullable = False)
+    blog_id = db.Column(db.Integer,nullable = False)
     created_on = db.Column(db.DateTime, server_default=db.func.now())
     updated_on = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
+
 
 db.create_all()
 
