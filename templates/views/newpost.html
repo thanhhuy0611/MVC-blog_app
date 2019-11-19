@@ -1,5 +1,5 @@
 <form method="POST" action="{{url_for('new_post')}}">
-    <label for="basic-url">What do you want to share?</label>
+    <label for="basic-url">What do you want to share, {{current_user.user_name}}?</label>
     <div class="input-group mb-3">
         <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon3">Title</span>
