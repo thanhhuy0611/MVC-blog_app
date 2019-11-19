@@ -6,6 +6,8 @@ from flask_wtf import FlaskForm
 from flask_migrate import Migrate
 from wtforms import StringField, validators, PasswordField, SubmitField
 import os 
+from dotenv import load_dotenv
+load_dotenv()
 
 #setup and config Flask app
 app = Flask(__name__)
