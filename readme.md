@@ -2,6 +2,7 @@
 
 Created with love by: Huy Tran
 
+##Link demo online: https://fakebook-huy.herokuapp.com/
 
 ## Required Features 🎯
 [x] User can register an account with his username, email, password.  
